@@ -1,74 +1,38 @@
 const express = require("express");
 
 const app = express();
-const router = express.Router();
 const port = 3000;
 
-function getDateTime() {
-    return new Date().toISOString().slice(0, 19).replace("T", " ");
-}
+// Assignment 1 & Assignment 3
+app.get("/student/:id", (req, res) => {
+    const id = req.params.id;
+    const { name, course } = req.query;
 
-// Assignment 2: global request logger.
-function logger(req, res, next) {
-    console.log(`${req.method} ${req.originalUrl} ${getDateTime()}`);
-    next();
-}
+    // Assignment 3: Query parameters are provided
+    if (name || course) {
+        return res.send(`
+            Student ID: ${id}\n
+            Name: ${name}\n
+            Course: ${course}
+        `);
+    }
 
-// Assignment 3: response time logger.
-function responseTimeLogger(req, res, next) {
-    const startTime = Date.now();
-
-    res.on("finish", () => {
-        const responseTime = Date.now() - startTime;
-        console.log(`${req.method} ${req.originalUrl} - ${responseTime} ms`);
-    });
-
-    next();
-}
-
-// Assignment 1: router-level middleware.
-function routerLogger(req, res, next) {
-    console.log(`${req.method} ${req.originalUrl} ${getDateTime()}`);
-    next();
-}
-
-app.use(logger);
-app.use(responseTimeLogger);
-
-router.use(routerLogger);
-
-router.get("/students", (req, res) => {
-    res.send("Students List");
+    // Assignment 1: Only route param
+    res.send(`Student ID: ${id}`);
 });
 
-router.get("/courses", (req, res) => {
-    res.send("Courses List");
-});
+// Assignment 2
+app.get("/search", (req, res) => {
+    const { name, course } = req.query;
 
-router.get("/faculty", (req, res) => {
-    res.send("Faculty List");
-});
+    if (!name && !course) {
+        return res.send("No search data provided.");
+    }
 
-app.use("/api", router);
-
-app.get("/", (req, res) => {
-    res.send("Welcome to Home Page");
-});
-
-app.get("/about", (req, res) => {
-    res.send("About Us");
-});
-
-app.get("/contact", (req, res) => {
-    res.send("Contact Information");
-});
-
-app.get("/products", (req, res) => {
-    res.send("Product List");
-});
-
-app.get("/users", (req, res) => {
-    res.send("User List");
+    res.send(`
+        Name: ${name} \n 
+        Course: ${course}
+    `);
 });
 
 app.listen(port, () => {
